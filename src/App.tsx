@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 function App() {
+
+  type Keyboard = {
+    target: String
+  }
 
   type Flag = {
     nsfw: Boolean,
@@ -21,9 +25,24 @@ function App() {
       safe: Boolean;
       lang: String
   }
-  
+
   const [jokeSetup,setJokeSetup] = useState<String>('')
   const [jokeDelivery, setJokeDelivery] = useState<String>('')
+  const ref = useRef(0)
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+    if(event.key === 'j' || event.key === 'J') {
+      jokeFinder()
+    }
+  }
+  document.addEventListener('keydown', handleKeyDown)
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown)
+  }
+  },[])
+
+ 
   const jokeFinder = async () => {
     try {
       const response = await fetch('https://v2.jokeapi.dev/joke/Any')
@@ -54,6 +73,7 @@ function App() {
           <img src = '/Hi.gif' className='w-full'/>
           <button className='bg-blue-500 text-white p-2 rounded-md shadow-md shadow-indigo-400 hover:bg-blue-600 mt-[-26px] ml-10 px-4' onClick = {jokeFinder}>Tell Me A Joke</button>
       </div>
+     {!jokeSetup && <p className="mt-2 ml-6 text-white font-semibold border-b-2">Or press J</p>}
      <div className="mt-5 font-semibold bg-white  text-blue-600 rounded-md leading-8 mx-5">
         {jokeSetup === '' ?  <></> : 
         <>
